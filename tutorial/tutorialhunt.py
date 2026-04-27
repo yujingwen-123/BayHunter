@@ -8,6 +8,7 @@
 
 import os
 import argparse
+import glob
 # set os.environment variables to ensure that numerical computations
 # do not do multiprocessing !! Essential !! Do not change !
 os.environ["MKL_NUM_THREADS"] = "1"
@@ -50,7 +51,6 @@ args = parser.parse_args()
 # Load priors and initparams from config.ini or simply create dictionaries.
 initfile = 'config.ini'
 priors, initparams = utils.load_params(initfile)
-initparams['savepath'] = op.join(initparams['savepath'], args.inv_mode)
 if not initparams['station'].endswith('_%s' % args.inv_mode):
     initparams['station'] = '%s_%s' % (initparams['station'], args.inv_mode)
 
@@ -155,6 +155,13 @@ initparams.update({'nchains': 5,
                    'iter_main': (2048 * 16),
                    'propdist': (0.025, 0.025, 0.015, 0.005, 0.005),
                    })
+
+# remove old chain files in the shared save directory to avoid
+# mixing different inversion modes (joint/rf/swd) in plotting/baywatch
+datadir = op.join(initparams['savepath'], 'data')
+for pattern in ['c???_p1*.npy', 'c???_p2*.npy', 'outliers.dat']:
+    for oldfile in glob.glob(op.join(datadir, pattern)):
+        os.remove(oldfile)
 
 
 #
