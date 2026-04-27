@@ -121,6 +121,14 @@ def _waterlevel_deconvolution(radial, vertical, dt, gauss, water):
     return np.fft.irfft(rf_spec, n=radial.size)
 
 
+def _shift_right_zerofill(data, nsamp):
+    if nsamp <= 0:
+        return data
+    shifted = np.zeros_like(data)
+    shifted[nsamp:] = data[:-nsamp]
+    return shifted
+
+
 class RFminiModRF(object):
     """Forward modeling of receiver functions based on SeisPy (Joachim Saul).
     """
@@ -237,6 +245,8 @@ class RFminiModRF(object):
         ur = np.fft.ifft(ur_freq).real[::-1] / self.nsamp
         uz = -np.fft.ifft(uz_freq).real[::-1] / self.nsamp
         qrfdata = _waterlevel_deconvolution(ur, uz, dt, gauss, water).astype(float)
+        tshift_samples = int(np.round(self.tshft * self.fsamp))
+        qrfdata = _shift_right_zerofill(qrfdata, tshift_samples)
 
         if nsv is not None:
             qrfdata *= float(vs[0]) / float(nsv)
