@@ -127,7 +127,7 @@ if args.inv_mode in ['joint', 'swd']:
     target_swd = Targets.RayleighDispersionPhase(xsw, ysw, yerr=ysw_err)
     targets_list.append(target_swd)
 if args.inv_mode in ['joint', 'rf']:
-    target_rf = Targets.PReceiverFunction(xrf, yrf)
+    target_rf = Targets.PReceiverFunction(xrf, yrf, yerr=yrf_err)
     target_rf.moddata.plugin.set_modelparams(gauss=1., water=0.01, p=6.4)
     targets_list.append(target_rf)
 

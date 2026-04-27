@@ -176,7 +176,12 @@ class BayWatcher(object):
             idx = self.axdict[ref]['ax']
             style = self.axdict[ref]['style']
 
-            self.axes[idx].errorbar(x, y, yerr=yerr, **style)
+            if np.all(np.isnan(yerr)):
+                plot_style = dict(style)
+                plot_style.pop('elinewidth', None)
+                self.axes[idx].plot(x, y, **plot_style)
+            else:
+                self.axes[idx].errorbar(x, y, yerr=yerr, **style)
 
         # initiate mod data
         self.targetlines = []
