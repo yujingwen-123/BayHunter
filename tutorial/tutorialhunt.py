@@ -107,8 +107,8 @@ truemodel = {'model': (pdep, pvs),
              'explike': explike,
              }
 
-print "Inversion mode: %s (%s)" % (args.inv_mode, ','.join(selected_targets))
-print truenoise, explike
+print("Inversion mode: %s (%s)" % (args.inv_mode, ','.join(selected_targets)))
+print(truenoise, explike)
 
 
 #
