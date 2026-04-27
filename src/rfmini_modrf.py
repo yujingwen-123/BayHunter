@@ -91,6 +91,7 @@ def _haskell(omega, rayp, nl, ipha, alpha, beta, rho, thick):
 
 
 def _fwd_seis(rayp, dt, npts, ipha, alpha, beta, rho, thick):
+    npts = int(npts)
     nlay = thick.size
     ur_freq = np.zeros(npts, dtype=np.complex128)
     uz_freq = np.zeros(npts, dtype=np.complex128)
@@ -169,7 +170,7 @@ class RFminiModRF(object):
 
         # get nsamp
         ndata = self.obsx.size
-        self.nsamp = 2.**int(np.ceil(np.log2(ndata * 2)))
+        self.nsamp = int(2**int(np.ceil(np.log2(ndata * 2))))
 
     def write_startmodel(self, h, vp, vs, rho, modfile, **params):
         qp = params.get('qp', np.ones(h.size) * 500)
