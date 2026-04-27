@@ -107,7 +107,7 @@ def _gaussian_taper(freq, gauss):
     return np.exp(- (np.pi * freq / gauss) ** 2)
 
 
-def _waterlevel_deconvolution(radial, vertical, dt, gauss, water):
+def _waterlevel_deconvolution(radial, vertical, dt, gauss, water, tshift=0.):
     radial_spec = np.fft.rfft(radial)
     vertical_spec = np.fft.rfft(vertical)
     freq = np.fft.rfftfreq(radial.size, d=dt)
@@ -118,15 +118,9 @@ def _waterlevel_deconvolution(radial, vertical, dt, gauss, water):
     denom = np.maximum(np.abs(denom), level)
     rf_spec = radial_spec * np.conjugate(vertical_spec) / denom
     rf_spec *= gfilter
+    if tshift != 0.:
+        rf_spec *= np.exp(-2j * np.pi * freq * tshift)
     return np.fft.irfft(rf_spec, n=radial.size)
-
-
-def _shift_right_zerofill(data, nsamp):
-    if nsamp <= 0:
-        return data
-    shifted = np.zeros_like(data)
-    shifted[nsamp:] = data[:-nsamp]
-    return shifted
 
 
 class RFminiModRF(object):
@@ -244,9 +238,8 @@ class RFminiModRF(object):
 
         ur = np.fft.ifft(ur_freq).real[::-1] / self.nsamp
         uz = -np.fft.ifft(uz_freq).real[::-1] / self.nsamp
-        qrfdata = _waterlevel_deconvolution(ur, uz, dt, gauss, water).astype(float)
-        tshift_samples = int(np.round(self.tshft * self.fsamp))
-        qrfdata = _shift_right_zerofill(qrfdata, tshift_samples)
+        qrfdata = _waterlevel_deconvolution(
+            ur, uz, dt, gauss, water, tshift=self.tshft).astype(float)
 
         if nsv is not None:
             qrfdata *= float(vs[0]) / float(nsv)
