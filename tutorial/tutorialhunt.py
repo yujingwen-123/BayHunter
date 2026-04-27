@@ -50,6 +50,9 @@ args = parser.parse_args()
 # Load priors and initparams from config.ini or simply create dictionaries.
 initfile = 'config.ini'
 priors, initparams = utils.load_params(initfile)
+initparams['savepath'] = op.join(initparams['savepath'], args.inv_mode)
+if not initparams['station'].endswith('_%s' % args.inv_mode):
+    initparams['station'] = '%s_%s' % (initparams['station'], args.inv_mode)
 
 # Load observed data (synthetic test data)
 xsw, _ysw = np.loadtxt('observed/st3_rdispph.dat').T
