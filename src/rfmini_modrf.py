@@ -207,8 +207,6 @@ class RFminiModRF(object):
                 f.write(mline % tuple(data.T[i]))
 
     def set_modelparams(self, **mparams):
-        if 'a' in mparams and 'gauss' not in mparams:
-            mparams['gauss'] = mparams.pop('a')
         self.modelparams.update(mparams)
 
     def compute_rf(self, h, vp, vs, rho, **params):
@@ -218,18 +216,18 @@ class RFminiModRF(object):
 
         Parameters are:
         # z  depths of the top of each layer
-        gauss/a: Gauss parameter (``a`` is an alias)
+        gauss: Gauss parameter
         water: water level
         p: angular slowness in sec/deg
         wtype: type of incident wave; must be 'P' or 'SV'
         nsv: tuple with near-surface S velocity and Poisson's ratio
             (will be computed by input model, if None)
         """
-        gauss = params.get('gauss', params.get('a', self.modelparams['gauss']))
-        water = params.get('water', self.modelparams['water'])
-        p = params.get('p', self.modelparams['p'])
-        wtype = params.get('wtype', self.modelparams['wtype'])
-        nsv = params.get('nsv', self.modelparams['nsv'])
+        gauss = self.modelparams['gauss']
+        water = self.modelparams['water']
+        p = self.modelparams['p']
+        wtype = self.modelparams['wtype']
+        nsv = self.modelparams['nsv']
 
         time = np.arange(self.nsamp) / self.fsamp - self.tshft
         rayp_s_per_km = float(p) * SEC_PER_DEG_TO_SEC_PER_KM

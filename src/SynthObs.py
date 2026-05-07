@@ -55,18 +55,15 @@ class SynthObs():
         return data
 
     @staticmethod
-    def return_rfdata(h, vs, vpvs=1.73, pars=None, x=None,
-                      gauss=None, a=None, water=None, p=None, nsv=None):
+    def return_rfdata(h, vs, vpvs=1.73, pars=dict(), x=None):
         """Return dictionary of forward modeled data based on RFMini.
         - x must be linspace to provide an equal sampling rate
         - pars is a dictionary of additional parameters used for RF
         computation (uses defaults if empty), such as:
             - gauss: Gaussian factor (low pass filter),
-            - a: alias of gauss
             - water: water level,
             - p: slowness in s/deg
             - nsv: near surface velocity (km/s) for RF rotation angle.
-        You can also pass gauss/a, water, p, nsv directly as keyword args.
         """
         if x is None:
             x = np.linspace(-5, 35, 201)
@@ -74,19 +71,10 @@ class SynthObs():
         h = np.array(h)
         vs = np.array(vs)
 
-        if pars is None:
-            pars = {}
-
-        if gauss is None:
-            gauss = pars.get('gauss', pars.get('a', 1.0))
-        if a is not None:
-            gauss = a
-        if water is None:
-            water = pars.get('water', 0.001)
-        if p is None:
-            p = pars.get('p', 6.4)
-        if nsv is None:
-            nsv = pars.get('nsv', None)
+        gauss = pars.get('gauss', 1.0)
+        water = pars.get('water', 0.001)
+        p = pars.get('p', 6.4)
+        nsv = pars.get('nsv', None)
 
         target5 = Targets.PReceiverFunction(x=x, y=None)
         target5.moddata.plugin.set_modelparams(
