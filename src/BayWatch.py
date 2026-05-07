@@ -453,6 +453,9 @@ class BayWatcher(object):
                     continue
 
             if arrmodels is not None and arrvpvs is not None:
+                if np.isnan(arrvpvs[idx]) or np.isnan(arrmodels[idx][0]):
+                    self.chainarrays[idx] = (models, likes, noises, vpvss)
+                    continue
                 vpvs = float(arrvpvs[idx])
                 # print(vpvs)
 
@@ -472,6 +475,9 @@ class BayWatcher(object):
                     self.update_models(model, vpvs)  # plot
 
             if arrlikes is not None:
+                if np.isnan(arrlikes[idx]):
+                    self.chainarrays[idx] = (models, likes, noises, vpvss)
+                    continue
                 like = float(arrlikes[idx])
 
                 likes = np.roll(likes, -1)
@@ -482,6 +488,9 @@ class BayWatcher(object):
 
             if arrnoise is not None:
                 noise = arrnoise[idx]
+                if np.isnan(noise[0]):
+                    self.chainarrays[idx] = (models, likes, noises, vpvss)
+                    continue
 
                 noises = np.roll(noises, -1, axis=0)
                 noises[-1] = noise
