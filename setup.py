@@ -39,7 +39,14 @@ setup(
     author="Jennifer Dreiling",
     author_email="jennifer.dreiling@gfz-potsdam.de",
     description=("Transdimensional Bayesian Inversion of RF and/or SWD."),
-    install_requires=[],
+    install_requires=[
+        'numpy>=1.20,<1.24',
+        'scipy',
+        'matplotlib',
+        'pyzmq',
+        'configobj',
+        'PyPDF2<3',
+    ],
     url="https://github.com/jenndrei/BayHunter",
     packages=['BayHunter'],
     package_dir={
