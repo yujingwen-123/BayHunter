@@ -87,7 +87,9 @@ class BayWatcher(object):
                        'noise': {'ax': 4, 'style': noise}}
 
     def init_plot(self):
+        plt.style.use('default')
         self.fig, self.axes = plt.subplots(figsize=(8, 7))
+        self.fig.patch.set_facecolor('white')
         self.fig.subplots_adjust(hspace=0.9, wspace=0.1)
         self.fig.canvas.set_window_title('BayWatch. Inversion live-stream.')
         ax1 = plt.subplot2grid((10, 8), (0, 0), rowspan=10, colspan=3)  # vel-dep
@@ -98,6 +100,8 @@ class BayWatcher(object):
         ax5 = plt.subplot2grid((10, 8), (2, 4), rowspan=2, colspan=4)  # noise
 
         self.axes = [ax1, ax3, ax4, ax2, ax5, inax]
+        for ax in self.axes:
+            ax.set_facecolor('white')
         # -----------------------------------
         # plot 1: vs-depth model
         self.modelline, = self.axes[0].plot(np.nan, np.nan, color='k', lw=0.7)
@@ -176,7 +180,12 @@ class BayWatcher(object):
             idx = self.axdict[ref]['ax']
             style = self.axdict[ref]['style']
 
-            self.axes[idx].errorbar(x, y, yerr=yerr, **style)
+            if np.all(np.isnan(yerr)):
+                plot_style = dict(style)
+                plot_style.pop('elinewidth', None)
+                self.axes[idx].plot(x, y, **plot_style)
+            else:
+                self.axes[idx].errorbar(x, y, yerr=yerr, **style)
 
         # initiate mod data
         self.targetlines = []
@@ -444,6 +453,9 @@ class BayWatcher(object):
                     continue
 
             if arrmodels is not None and arrvpvs is not None:
+                if np.isnan(arrvpvs[idx]) or np.isnan(arrmodels[idx][0]):
+                    self.chainarrays[idx] = (models, likes, noises, vpvss)
+                    continue
                 vpvs = float(arrvpvs[idx])
                 # print(vpvs)
 
@@ -463,6 +475,9 @@ class BayWatcher(object):
                     self.update_models(model, vpvs)  # plot
 
             if arrlikes is not None:
+                if np.isnan(arrlikes[idx]):
+                    self.chainarrays[idx] = (models, likes, noises, vpvss)
+                    continue
                 like = float(arrlikes[idx])
 
                 likes = np.roll(likes, -1)
@@ -473,6 +488,9 @@ class BayWatcher(object):
 
             if arrnoise is not None:
                 noise = arrnoise[idx]
+                if np.isnan(noise[0]):
+                    self.chainarrays[idx] = (models, likes, noises, vpvss)
+                    continue
 
                 noises = np.roll(noises, -1, axis=0)
                 noises[-1] = noise
