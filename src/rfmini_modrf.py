@@ -240,6 +240,11 @@ class RFminiModRF(object):
         uz = -np.fft.ifft(uz_freq).real[::-1] / self.nsamp
         qrfdata = _waterlevel_deconvolution(
             ur, uz, dt, gauss, water, tshift=self.tshft).astype(float)
+        pre_idx = time < 0
+        if np.any(pre_idx):
+            qrfdata -= np.mean(qrfdata[pre_idx])
+        else:
+            qrfdata -= np.mean(qrfdata)
 
         if nsv is not None:
             qrfdata *= float(vs[0]) / float(nsv)
