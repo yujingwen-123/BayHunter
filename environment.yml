@@ -1,0 +1,16 @@
+name: bayhunter
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - pip
+  - numpy=1.23.*
+  - scipy
+  - matplotlib
+  - pyzmq
+  - configobj
+  - cython
+  - setuptools<60
+  - pip:
+      - PyPDF2<3
